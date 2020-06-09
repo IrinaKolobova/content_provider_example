@@ -1,11 +1,14 @@
 package com.ivk.contentproviderexam
 
 import android.os.Bundle
+import android.provider.ContactsContract
+import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,8 +18,14 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            Log.d(TAG, "fab onClick: starts")
+            val projection = arrayOf((ContactsContract.Contacts.DISPLAY_NAME_PRIMARY))
+            val cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
+            Log.d(TAG, "fab onClick: ends")
         }
     }
 
