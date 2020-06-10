@@ -13,6 +13,8 @@ import kotlinx.android.synthetic.main.content_main.*
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_main.*
 
 private const val TAG = "MainActivity"
 private const val REQUEST_CODE_READ_CONTACTS = 1
@@ -39,22 +41,26 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
             Log.d(TAG, "fab onClick: starts")
-            val projection = arrayOf((ContactsContract.Contacts.DISPLAY_NAME_PRIMARY))
-            val cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
+            if(readGranted){
+                val projection = arrayOf((ContactsContract.Contacts.DISPLAY_NAME_PRIMARY))
+                val cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
                     projection,
                     null,
                     null,
                     ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
-            val contacts = ArrayList<String>()          //create a list to hold contacts
-            cursor?.use {
-                while(it.moveToNext()){
-                    contacts.add(it.getString(it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)))
+                val contacts = ArrayList<String>()          //create a list to hold contacts
+                cursor?.use {
+                    while(it.moveToNext()){
+                        contacts.add(it.getString(it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)))
+                    }
                 }
+
+                val adapter = ArrayAdapter<String>(this, R.layout.contact_detail, R.id.name, contacts)
+                contact_names.adapter = adapter
+            } else {
+                Snackbar.make(view, R.string.fab_snackbar, Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show()
             }
-
-            val adapter = ArrayAdapter<String>(this, R.layout.contact_detail, R.id.name, contacts)
-            contact_names.adapter = adapter
-
             Log.d(TAG, "fab onClick: ends")
         }
         Log.d(TAG, "onCreate: ends")
